@@ -6,10 +6,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.IllegalRawDataException;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.TcpPacket;
+import org.pcap4j.packet.*;
 import scala.Array;
 
 import java.io.IOException;
@@ -129,7 +126,7 @@ public class PacketProcess {
         @Override
         public Packet deserialize(byte[] bytes) throws IOException {
             try {
-                return EthernetPacket.newPacket(bytes, 0, bytes.length);
+                return IpV4Packet.newPacket(bytes, 0, bytes.length);
             } catch (IllegalRawDataException e) {
                 e.printStackTrace();
                 return null;
