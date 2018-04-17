@@ -27,6 +27,8 @@ class PacketToRawMap implements MapFunction<Packet, byte[]> {
 
     @Override
     public byte[] map(Packet packet) throws Exception {
+        if (packet == null)
+            return null;
         return packet.getRawData();
     }
 }
@@ -92,20 +94,28 @@ public class PacketProcess {
                 .map(new MapFunction<Packet, Packet>() {
                     @Override
                     public Packet map(Packet p) throws Exception {
-                        Packet payload = p.getPayload();
-                        if (payload instanceof TcpPacket) {
-                            TcpPacket.TcpHeader header = (TcpPacket.TcpHeader) payload.getHeader();
-                            Packet tcpData = payload.getPayload();
-                            if (tcpData.getRawData().length > 0) {
-                                return tcpData;
-                            }
-                        }
+                        Packet payload = p.getPayload(); //tcp packet
+                        TcpPacket.TcpHeader header = (TcpPacket.TcpHeader) payload.getHeader();
+                        Packet tcpData = payload.getPayload(); // tcp payload
+                        return tcpData;
                     }
                 })
-                .map(new PacketToRawMap())
-                .map(new HttpBodyMap());
+                .filter(new FilterFunction<Packet>() {
+                    @Override
+                    public boolean filter(Packet packet) throws Exception {
+                        return packet.getRawData().length > 0;
+                    }
+                })
+//                .map(new PacketToRawMap())
+//                .map(new HttpBodyMap());
+                .map(new MapFunction<Packet, String>() {
 
-        dataStream.print();
+                    @Override
+                    public String map(Packet packet) throws Exception {
+                        return new String(packet.getRawData());
+                    }
+                }).print();
+
         // TODO sink to fs
 
         try {
