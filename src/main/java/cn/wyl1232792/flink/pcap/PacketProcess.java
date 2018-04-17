@@ -69,12 +69,6 @@ public class PacketProcess {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        try {
-            env.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "ali2.wyl1232792.cn:9092");
 
@@ -90,9 +84,11 @@ public class PacketProcess {
                 .filter(new FilterFunction<Packet>() {
                     @Override
                     public boolean filter(Packet p) throws Exception {
+                        System.out.println("received");
                         if (p == null)
                             return false;
                         Packet payload = p.getPayload();
+                        System.out.println(payload.getClass());
                         return payload instanceof TcpPacket;
                     }
                 })
@@ -108,6 +104,7 @@ public class PacketProcess {
                 .filter(new FilterFunction<Packet>() {
                     @Override
                     public boolean filter(Packet packet) throws Exception {
+                        System.out.println("received on length filter");
                         return packet.getRawData().length > 0;
                     }
                 })
