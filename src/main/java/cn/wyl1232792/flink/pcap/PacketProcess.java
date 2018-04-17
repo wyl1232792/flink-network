@@ -126,7 +126,7 @@ public class PacketProcess {
         @Override
         public Packet deserialize(byte[] bytes) throws IOException {
             try {
-                return IpV4Packet.newPacket(bytes, 0, bytes.length);
+                return EthernetPacket.newPacket(bytes, 0, bytes.length).getPayload();
             } catch (IllegalRawDataException e) {
                 e.printStackTrace();
                 return null;
