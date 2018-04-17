@@ -69,6 +69,12 @@ public class PacketProcess {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        try {
+            env.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "ali2.wyl1232792.cn:9092");
 
@@ -84,6 +90,8 @@ public class PacketProcess {
                 .filter(new FilterFunction<Packet>() {
                     @Override
                     public boolean filter(Packet p) throws Exception {
+                        if (p == null)
+                            return false;
                         Packet payload = p.getPayload();
                         return payload instanceof TcpPacket;
                     }
