@@ -1,5 +1,6 @@
 package cn.wyl1232792.flink.pcap;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -81,6 +82,13 @@ public class PacketProcess {
                 .addSource(myConsumer);
 
         dataStream
+                .filter(new FilterFunction<Packet>() {
+                    @Override
+                    public boolean filter(Packet p) throws Exception {
+                        Packet payload = p.getPayload();
+                        return payload instanceof TcpPacket;
+                    }
+                })
                 .map(new MapFunction<Packet, Packet>() {
                     @Override
                     public Packet map(Packet p) throws Exception {
@@ -92,7 +100,6 @@ public class PacketProcess {
                                 return tcpData;
                             }
                         }
-                        return null;
                     }
                 })
                 .map(new PacketToRawMap())
